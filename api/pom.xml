@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>si.fri.rso.skupina3</groupId>
-            <artifactId>rv-park-tenancy</artifactId>
+            <artifactId>rv-park-tenancy-services</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
