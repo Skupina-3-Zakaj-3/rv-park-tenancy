@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "rv-park-tenancies")
+@Table(name = "rv_park_tenancies")
 @NamedQueries(value =
         {
                 @NamedQuery(name = "RvParkTenancyEntity.getAll",
