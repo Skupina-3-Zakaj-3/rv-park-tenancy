@@ -14,13 +14,13 @@ docker network create rso
 
 ## Run database in network
 ```bash
-docker run -d --name pg-rv-park-tenancy --network="rso" -e POSTGRES_USER=dbuser -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=rvs -p 5436:5432 postgres:13
+docker run -d --name pg-rv-park-tenancy --network="rso" -e POSTGRES_USER=dbuser -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=rv_park_tenancies -p 5436:5432 postgres:13
 ```
 
 ## Run the container in network
 
 ```bash
-docker run -p 8088:8088 --name rv-park-tenancy --network="rso" -e KUMULUZEE_DATASOURCES0_CONNECTIONURL=jdbc:postgresql://pg-rv-park-tenancy:5432/rv-park-tenancies rv-park-tenancy
+docker run -p 8088:8088 --name rv_park_tenancies --network="rso" -e KUMULUZEE_DATASOURCES0_CONNECTIONURL=jdbc:postgresql://pg-rv-park-tenancy:5432/rv_park_tenancies rv_park_tenancies
 ```
 
 ## Run the container from Docker hub in network

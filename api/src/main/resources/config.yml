@@ -9,7 +9,7 @@ kumuluzee:
       port: 8088
   datasources:
     - jndi-name: jdbc/RvParkTenancyDS
-      connection-url: jdbc:postgresql://localhost:5436/rv-park-tenancies
+      connection-url: jdbc:postgresql://localhost:5436/rv_park_tenancies
       username: dbuser
       password: postgres
       pool:
@@ -21,7 +21,7 @@ kumuluzee:
         jndi-name: jdbc/RvParkTenancyDS
   metrics:
     web-instrumentation:
-      - name: rvs-endpoint
+      - name: rv-park-tenancies-endpoint
         url-pattern: /v1/rv-park-tenancies/*
   logs:
     config-file: '<?xml version="1.0" encoding="UTF-8"?>
