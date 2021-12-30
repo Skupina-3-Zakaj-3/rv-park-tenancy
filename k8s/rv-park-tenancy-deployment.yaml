@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rv-park-tenancy-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rv-park-tenancy
+  template:
+    metadata:
+      labels:
+        app: rv-park-tenancy
+    spec:
+      containers:
+        - image: anzeha/rv-park-tenancy
+          name: rv-park-tenancy
+          env:
+            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
+              value: jdbc:postgresql://surus.db.elephantsql.com/bksuqtam
+            - name: KUMULUZEE_DATASOURCES0_USERNAME
+              value: bksuqtam
+            - name: KUMULUZEE_DATASOURCES0_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-pass
+                  key: KUMULUZEE_DATASOURCES0_PASSWORD_RV_PARK_TENANCY
+            - name: KUMULUZEE_DATASOURCES0_POOL_MAX-SIZE
+              value: "1"
+          ports:
+            - containerPort: 8088
+              name: server
+              protocol: TCP
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rv-park-tenancy
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8088
+      protocol: TCP
+      targetPort: server
+  selector:
+    app: rv-park-tenancy
