@@ -2,14 +2,22 @@ package si.fri.rso.skupina3.rv_park_tenancy.services.beans;
 
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
+import si.fri.rso.skupina3.lib.BillDto;
+import si.fri.rso.skupina3.lib.ParkDto;
 import si.fri.rso.skupina3.lib.RvParkTenancy;
 import si.fri.rso.skupina3.rv_park_tenancy.models.converters.RvParkTenancyConverter;
 import si.fri.rso.skupina3.rv_park_tenancy.models.entities.RvParkTenancyEntity;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,6 +30,19 @@ public class RvParkTenancyBean {
 
     @Inject
     private EntityManager em;
+
+    private Client httpClient;
+    private String billBaseUrl;
+    private String parkBaseUrl;
+
+    @PostConstruct
+    private void init() {
+        httpClient = ClientBuilder.newClient();
+        billBaseUrl = "http://localhost:8087/v1/park_bills";
+//        parkBaseUrl = "http://localhost:8081/v1/parks";
+//        billBaseUrl = "http://20.72.172.42/billing/v1/park_bills";
+        parkBaseUrl = "http://20.72.172.42/parks/v1/parks";
+    }
 
     public List<RvParkTenancy> getRvParkTenancies(UriInfo uriInfo) {
 
@@ -43,14 +64,36 @@ public class RvParkTenancyBean {
         return RvParkTenancyConverter.toDto(parkTenancyEntity);
     }
 
-    public RvParkTenancy createRvParkTenancy(RvParkTenancy bill) {
+    public RvParkTenancy createRvParkTenancy(RvParkTenancy rvParkTenancy) {
 
-        RvParkTenancyEntity rvParkTenancyEntity = RvParkTenancyConverter.toEntity(bill);
+        RvParkTenancyEntity rvParkTenancyEntity = RvParkTenancyConverter.toEntity(rvParkTenancy);
 
         try {
             beginTx();
             em.persist(rvParkTenancyEntity);
             commitTx();
+            ParkDto park = httpClient
+                    .target(String.format("%s/%d", parkBaseUrl, rvParkTenancy.getPark_id()))
+                    .request()
+                    .get(ParkDto.class);
+
+            BillDto bill = new BillDto();
+            bill.setPayer_id(rvParkTenancy.getUser_id());
+            bill.setReceiver_id(park.getUser_id());
+            bill.setPark_id(park.getRv_park_id());
+            // TODO: Compute total cost depending on start and end date
+            bill.setPrice(park.getCost_per_day());
+            bill.setReservation_id(rvParkTenancyEntity.getPark_tenancy_id());
+
+            Response response = httpClient
+                    .target(billBaseUrl)
+                    .request().post(Entity.json(bill));
+
+            BillDto createdBill = response.readEntity(BillDto.class);
+            rvParkTenancyEntity.setRv_park_bill_id(createdBill.getBill_id());
+            updateRvParkTenancy(rvParkTenancyEntity.getPark_tenancy_id(),
+                    RvParkTenancyConverter.toDto(rvParkTenancyEntity));
+
         }
         catch (Exception e) {
             rollbackTx();
@@ -65,25 +108,25 @@ public class RvParkTenancyBean {
 
     public RvParkTenancy updateRvParkTenancy(Integer parkTenancyId, RvParkTenancy parkTenancy) {
 
-        RvParkTenancyEntity billEntity = em.find(RvParkTenancyEntity.class, parkTenancyId);
+        RvParkTenancyEntity rvParkTenancy = em.find(RvParkTenancyEntity.class, parkTenancyId);
 
-        if (billEntity == null) {
+        if (rvParkTenancy == null) {
             return null;
         }
 
-        RvParkTenancyEntity updatedBillEntity = RvParkTenancyConverter.toEntity(parkTenancy);
+        RvParkTenancyEntity updatedParkTenancyEntity = RvParkTenancyConverter.toEntity(parkTenancy);
 
         try {
             beginTx();
-            updatedBillEntity.setPark_tenancy_id(parkTenancy.getPark_tenancy_id());
-            updatedBillEntity = em.merge(updatedBillEntity);
+            updatedParkTenancyEntity.setPark_tenancy_id(parkTenancy.getPark_tenancy_id());
+            updatedParkTenancyEntity = em.merge(updatedParkTenancyEntity);
             commitTx();
         }
         catch (Exception e) {
             rollbackTx();
         }
 
-        return RvParkTenancyConverter.toDto(updatedBillEntity);
+        return RvParkTenancyConverter.toDto(updatedParkTenancyEntity);
     }
 
     public boolean deleteRvParkTenancy(Integer parkTenancyId) {
