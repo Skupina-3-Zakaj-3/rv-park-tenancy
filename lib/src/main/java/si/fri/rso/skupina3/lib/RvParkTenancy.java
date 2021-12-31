@@ -6,6 +6,7 @@ public class RvParkTenancy {
 
     private Integer park_tenancy_id;
     private Integer user_id;
+    private Integer park_id;
     private Date start_date;
     private Date end_date;
     private Integer rv_park_bill_id;
@@ -24,6 +25,14 @@ public class RvParkTenancy {
 
     public void setUser_id(Integer user_id) {
         this.user_id = user_id;
+    }
+
+    public Integer getPark_id() {
+        return park_id;
+    }
+
+    public void setPark_id(Integer park_id) {
+        this.park_id = park_id;
     }
 
     public Date getStart_date() {

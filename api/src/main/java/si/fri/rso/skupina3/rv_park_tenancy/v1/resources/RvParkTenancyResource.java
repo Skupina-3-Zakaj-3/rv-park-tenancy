@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @Consumes(MediaType.APPLICATION_JSON)
 public class RvParkTenancyResource {
 
-    private Logger log = Logger.getLogger(RvParkTenancyResource.class.getName());
+    private final Logger log = Logger.getLogger(RvParkTenancyResource.class.getName());
 
     @Inject
     private RvParkTenancyBean rvParkTenancyBean;
@@ -28,9 +28,9 @@ public class RvParkTenancyResource {
     protected UriInfo uriInfo;
 
     @GET
-    public Response getrvParkTenancies() {
+    public Response getRvParkTenancies() {
 
-        log.info("getrvParkTenancies() - GET");
+        log.info("getRvParkTenancies() - GET");
         List<RvParkTenancy> rvs = rvParkTenancyBean.getRvParkTenancies(uriInfo);
 
         return Response.status(Response.Status.OK).entity(rvs).build();
@@ -55,10 +55,14 @@ public class RvParkTenancyResource {
     public Response createRvParkTenancy(RvParkTenancy rvParkTenancy) {
 
         log.info("RvParkTenancy() - POST");
-        // TODO: check for needed parameters and send back bad request if they are not present
-        if (rvParkTenancy == null) {
+
+        if (rvParkTenancy == null || rvParkTenancy.getPark_id() == null || rvParkTenancy.getUser_id() == null ||
+                rvParkTenancy.getStart_date() == null || rvParkTenancy.getEnd_date() == null
+        ) {
+            log.info("Some needed values are missing!");
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+
         else {
             rvParkTenancy = rvParkTenancyBean.createRvParkTenancy(rvParkTenancy);
         }
@@ -71,7 +75,8 @@ public class RvParkTenancyResource {
     public Response putRvParkTenancy(@PathParam("parkTenancyId") Integer parkTenancyId, RvParkTenancy parkTenancy) {
 
         log.info("putRvParkTenancy() - PUT");
-        //TODO: preveri, da so ustrezna polja
+
+        parkTenancy.setPark_tenancy_id(parkTenancyId);
         parkTenancy = rvParkTenancyBean.updateRvParkTenancy(parkTenancyId, parkTenancy);
 
         if (parkTenancy == null) {
