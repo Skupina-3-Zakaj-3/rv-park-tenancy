@@ -16,9 +16,11 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -81,8 +83,14 @@ public class RvParkTenancyBean {
             bill.setPayer_id(rvParkTenancy.getUser_id());
             bill.setReceiver_id(park.getUser_id());
             bill.setPark_id(park.getRv_park_id());
-            // TODO: Compute total cost depending on start and end date
-            bill.setPrice(park.getCost_per_day());
+
+            LocalDate startDate = rvParkTenancy.getStart_date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate endDate = rvParkTenancy.getEnd_date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            long reservationDays = ChronoUnit.DAYS.between(startDate, endDate);
+            reservationDays = reservationDays == 0 ? 1 : reservationDays;
+            log.info(String.valueOf(reservationDays));
+            float price = reservationDays * park.getCost_per_day();
+            bill.setPrice(price);
             bill.setReservation_id(rvParkTenancyEntity.getPark_tenancy_id());
 
             Response response = httpClient

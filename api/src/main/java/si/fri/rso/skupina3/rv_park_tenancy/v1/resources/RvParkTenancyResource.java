@@ -63,6 +63,11 @@ public class RvParkTenancyResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+        else if (rvParkTenancy.getEnd_date().before(rvParkTenancy.getStart_date())) {
+            log.info("End date must be after start date!");
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         else {
             rvParkTenancy = rvParkTenancyBean.createRvParkTenancy(rvParkTenancy);
         }
