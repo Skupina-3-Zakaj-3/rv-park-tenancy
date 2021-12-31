@@ -40,10 +40,10 @@ public class RvParkTenancyBean {
     @PostConstruct
     private void init() {
         httpClient = ClientBuilder.newClient();
-//        billBaseUrl = "http://localhost:8087/v1/park_bills";
-//        parkBaseUrl = "http://localhost:8081/v1/parks";
-        billBaseUrl = "http://20.72.172.42/billing/v1/park_bills";
-        parkBaseUrl = "http://20.72.172.42/parks/v1/parks";
+        billBaseUrl = "http://localhost:8087/v1/park_bills/";
+//        parkBaseUrl = "http://localhost:8081/v1/parks/";
+//        billBaseUrl = "http://20.72.172.42/billing/v1/park_bills/";
+        parkBaseUrl = "http://20.72.172.42/parks/v1/parks/";
     }
 
     public List<RvParkTenancy> getRvParkTenancies(UriInfo uriInfo) {
@@ -88,7 +88,7 @@ public class RvParkTenancyBean {
             LocalDate endDate = rvParkTenancy.getEnd_date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             long reservationDays = ChronoUnit.DAYS.between(startDate, endDate);
             reservationDays = reservationDays == 0 ? 1 : reservationDays;
-            log.info(String.valueOf(reservationDays));
+//            log.info(String.valueOf(reservationDays));
             float price = reservationDays * park.getCost_per_day();
             bill.setPrice(price);
             bill.setReservation_id(rvParkTenancyEntity.getPark_tenancy_id());
@@ -141,7 +141,10 @@ public class RvParkTenancyBean {
 
         RvParkTenancyEntity rvParkTenancyEntity = em.find(RvParkTenancyEntity.class, parkTenancyId);
 
-        if (rvParkTenancyEntity != null) {
+        Integer billId = rvParkTenancyEntity.getRv_park_bill_id();
+        Response response = httpClient.target(billBaseUrl + billId).request().delete();
+        log.info(String.valueOf(response.getStatus()));
+        if (rvParkTenancyEntity != null && response.getStatus() == 200) {
             try {
                 beginTx();
                 em.remove(rvParkTenancyEntity);
