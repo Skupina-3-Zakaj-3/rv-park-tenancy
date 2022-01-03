@@ -23,6 +23,7 @@
         <kumuluzee-health.version>2.4.2</kumuluzee-health.version>
         <kumuluzee-rest.version>1.5.1</kumuluzee-rest.version>
         <postgresql.version>42.3.0</postgresql.version>
+        <kumuluzee-cors.version>1.0.6</kumuluzee-cors.version>
     </properties>
 
     <dependencyManagement>
@@ -73,6 +74,11 @@
                 <groupId>si.fri.rso.skupina3</groupId>
                 <artifactId>rv-park-tenancy-lib</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.kumuluz.ee.cors</groupId>
+                <artifactId>kumuluzee-cors</artifactId>
+                <version>${kumuluzee-cors.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

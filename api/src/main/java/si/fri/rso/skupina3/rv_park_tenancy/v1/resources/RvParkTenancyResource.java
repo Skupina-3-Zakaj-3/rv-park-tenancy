@@ -1,5 +1,6 @@
 package si.fri.rso.skupina3.rv_park_tenancy.v1.resources;
 
+import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import si.fri.rso.skupina3.lib.RvParkTenancy;
 import si.fri.rso.skupina3.rv_park_tenancy.services.beans.RvParkTenancyBean;
 
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 @Path("/rv-park-tenancies")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@CrossOrigin(supportedMethods = "GET, POST, HEAD, DELETE, OPTIONS")
 public class RvParkTenancyResource {
 
     private final Logger log = Logger.getLogger(RvParkTenancyResource.class.getName());
@@ -60,6 +62,11 @@ public class RvParkTenancyResource {
                 rvParkTenancy.getStart_date() == null || rvParkTenancy.getEnd_date() == null
         ) {
             log.info("Some needed values are missing!");
+            log.info(String.valueOf(rvParkTenancy));
+            log.info(String.valueOf(rvParkTenancy.getPark_id()));
+            log.info(String.valueOf(rvParkTenancy.getUser_id()));
+            log.info(String.valueOf(rvParkTenancy.getStart_date()));
+            log.info(String.valueOf(rvParkTenancy.getEnd_date()));
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
