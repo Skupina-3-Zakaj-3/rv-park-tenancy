@@ -1,11 +1,14 @@
 package si.fri.rso.skupina3.rv_park_tenancy.services.beans;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kumuluz.ee.rest.beans.QueryParameters;
 import com.kumuluz.ee.rest.utils.JPAUtils;
 import si.fri.rso.skupina3.lib.BillDto;
 import si.fri.rso.skupina3.lib.ParkDto;
 import si.fri.rso.skupina3.lib.RvParkTenancy;
+import si.fri.rso.skupina3.lib.UserReservationsDto;
 import si.fri.rso.skupina3.rv_park_tenancy.models.converters.RvParkTenancyConverter;
+import si.fri.rso.skupina3.rv_park_tenancy.models.converters.UserReservationsDtoConverter;
 import si.fri.rso.skupina3.rv_park_tenancy.models.entities.RvParkTenancyEntity;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +24,7 @@ import javax.ws.rs.core.UriInfo;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -29,6 +33,7 @@ import java.util.stream.Collectors;
 public class RvParkTenancyBean {
 
     private final Logger log = Logger.getLogger(RvParkTenancyBean.class.getName());
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Inject
     private EntityManager em;
@@ -41,10 +46,10 @@ public class RvParkTenancyBean {
     private void init() {
         //TODO: popravi linke
         httpClient = ClientBuilder.newClient();
-//        billBaseUrl = "http://localhost:8087/v1/park_bills/";
-//        parkBaseUrl = "http://localhost:8081/v1/parks/";
-        billBaseUrl = "http://20.72.172.42/billing/v1/park_bills/";
-        parkBaseUrl = "http://20.72.172.42/parks/v1/parks/";
+        billBaseUrl = "http://localhost:8087/v1/park_bills/";
+        parkBaseUrl = "http://localhost:8089/v1/parks/";
+//        billBaseUrl = "http://20.72.172.42/billing/v1/park_bills/";
+//        parkBaseUrl = "http://20.72.172.42/parks/v1/parks/";
     }
 
     public List<RvParkTenancy> getRvParkTenancies(UriInfo uriInfo) {
@@ -160,6 +165,37 @@ public class RvParkTenancyBean {
         }
 
         return true;
+    }
+
+    public List<UserReservationsDto> getUserReservedParks(Integer userId){
+
+        List<RvParkTenancyEntity> parkTenancyEntityList = em
+                .createNamedQuery("RvParkTenancyEntity.userReservations", RvParkTenancyEntity.class)
+                .setParameter("user_id", userId)
+                .getResultList();
+
+        log.info(String.valueOf(parkTenancyEntityList.isEmpty()));
+
+        List<UserReservationsDto> userReservationsDtos = new ArrayList<>();
+        for (RvParkTenancyEntity reservation : parkTenancyEntityList
+             ) {
+
+            log.info(String.format("%s?filter=rv_park_id:EQ:%d", parkBaseUrl, reservation.getPark_id()));
+            ArrayList parkDtos = httpClient
+                    .target(String.format("%s?filter=rv_park_id:EQ:%d", parkBaseUrl, reservation.getPark_id()))
+                    .request()
+                    .get(ArrayList.class);
+
+            for (Object dto : parkDtos) {
+                ParkDto parkDto = mapper.convertValue(dto, ParkDto.class);
+                UserReservationsDto userReservationsDto = UserReservationsDtoConverter
+                        .toUserReservationDto(parkDto, reservation);
+                userReservationsDtos.add(userReservationsDto);
+            }
+
+        }
+        log.info(String.valueOf(userReservationsDtos.isEmpty()));
+        return userReservationsDtos;
     }
 
 

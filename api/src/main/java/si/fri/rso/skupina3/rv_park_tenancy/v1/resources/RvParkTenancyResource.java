@@ -107,4 +107,19 @@ public class RvParkTenancyResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
+
+    @GET
+    @Path("users/{user_id}")
+    public Response getUserReservedParks(@PathParam("user_id") Integer userId) {
+
+        log.info("getUserReservedParls() - GET");
+
+        List rvParkTenancy = rvParkTenancyBean.getUserReservedParks(userId);
+
+        if(rvParkTenancy == null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.status(Response.Status.OK).entity(rvParkTenancy).build();
+    }
 }

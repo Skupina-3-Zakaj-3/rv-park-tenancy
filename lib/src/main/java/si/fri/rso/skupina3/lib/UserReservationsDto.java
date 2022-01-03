@@ -1,28 +1,21 @@
-package si.fri.rso.skupina3.rv_park_tenancy.models.entities;
+package si.fri.rso.skupina3.lib;
 
-import javax.persistence.*;
 import java.util.Date;
 
-@Entity
-@Table(name = "rv_park_tenancies")
-@NamedQueries(value =
-        {
-                @NamedQuery(name = "RvParkTenancyEntity.getAll",
-                        query = "SELECT parkTenancy FROM RvParkTenancyEntity parkTenancy"),
-                @NamedQuery(name= "RvParkTenancyEntity.userReservations",
-                        query = "SELECT reservation " +
-                                "FROM RvParkTenancyEntity reservation WHERE reservation.user_id = :user_id")
-        })
-public class RvParkTenancyEntity {
+public class UserReservationsDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer park_tenancy_id;
     private Integer user_id;
     private Integer park_id;
     private Date start_date;
     private Date end_date;
     private Integer rv_park_bill_id;
+
+    private Integer park_owner;
+    private String park_name;
+    private Float cost_per_day;
+    private String description;
+    private String location;
 
     public Integer getPark_tenancy_id() {
         return park_tenancy_id;
@@ -70,5 +63,45 @@ public class RvParkTenancyEntity {
 
     public void setRv_park_bill_id(Integer rv_park_bill_id) {
         this.rv_park_bill_id = rv_park_bill_id;
+    }
+
+    public Integer getPark_owner() {
+        return park_owner;
+    }
+
+    public void setPark_owner(Integer park_owner) {
+        this.park_owner = park_owner;
+    }
+
+    public String getPark_name() {
+        return park_name;
+    }
+
+    public void setPark_name(String park_name) {
+        this.park_name = park_name;
+    }
+
+    public Float getCost_per_day() {
+        return cost_per_day;
+    }
+
+    public void setCost_per_day(Float cost_per_day) {
+        this.cost_per_day = cost_per_day;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
