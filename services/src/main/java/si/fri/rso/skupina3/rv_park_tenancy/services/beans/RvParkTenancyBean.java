@@ -48,8 +48,8 @@ public class RvParkTenancyBean {
         httpClient = ClientBuilder.newClient();
 //        billBaseUrl = "http://localhost:8087/v1/park_bills/";
 //        parkBaseUrl = "http://localhost:8089/v1/parks/";
-        billBaseUrl = "http://20.72.172.42/billing/v1/park_bills/";
-        parkBaseUrl = "http://20.72.172.42/parks/v1/parks/";
+        billBaseUrl = "http://billing:8087/v1/park_bills/";
+        parkBaseUrl = "http://rv-park-catalog:8089/v1/parks/";
     }
 
     public List<RvParkTenancy> getRvParkTenancies(UriInfo uriInfo) {
