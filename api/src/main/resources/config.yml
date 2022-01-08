@@ -1,5 +1,5 @@
 kumuluzee:
-  name: service
+  name: park-tenancy-service
   env:
     name: dev
   version: 1.0.0
