@@ -1,6 +1,7 @@
 package si.fri.rso.skupina3.rv_park_tenancy.v1.resources;
 
 import com.kumuluz.ee.cors.annotations.CrossOrigin;
+import com.kumuluz.ee.logs.cdi.Log;
 import si.fri.rso.skupina3.lib.RvParkTenancy;
 import si.fri.rso.skupina3.rv_park_tenancy.services.beans.RvParkTenancyBean;
 
@@ -14,6 +15,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Log
 @ApplicationScoped
 @Path("/rv-park-tenancies")
 @Produces(MediaType.APPLICATION_JSON)
